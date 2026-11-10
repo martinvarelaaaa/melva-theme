@@ -1,0 +1,118 @@
+{
+  "sections": {
+    "hero_text": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Melva",
+            "heading_size": "h0"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "Indumentaria femenina hecha en Uruguay. Lotes pequeños, stock real, prendas que duran."
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "button_label": "Ver colección",
+            "button_link": "shopify://collections/all",
+            "button_style_outline_1": true
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "button"
+      ],
+      "settings": {
+        "desktop_content_position": "middle-center",
+        "content_alignment": "center",
+        "color_scheme": "scheme-1",
+        "full_width": true,
+        "padding_top": 72,
+        "padding_bottom": 72
+      }
+    },
+    "featured_collection": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "Nueva colección",
+        "heading_size": "h2",
+        "description": "",
+        "show_description": false,
+        "description_style": "body",
+        "collection": "all",
+        "products_to_show": 8,
+        "columns_desktop": 4,
+        "color_scheme": "scheme-1",
+        "full_width": false,
+        "show_view_all": true,
+        "view_all_style": "solid",
+        "enable_desktop_slider": false,
+        "swipe_on_mobile": false,
+        "image_ratio": "adapt",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "quick_add": "none",
+        "columns_mobile": "2",
+        "padding_top": 12,
+        "padding_bottom": 40
+      }
+    },
+    "values": {
+      "type": "multicolumn",
+      "blocks": {
+        "b1": {
+          "type": "column",
+          "settings": {
+            "title": "Producción uruguaya",
+            "text": "Cada prenda se corta y confecciona localmente, en lotes pequeños."
+          }
+        },
+        "b2": {
+          "type": "column",
+          "settings": {
+            "title": "Cambios por 15 días",
+            "text": "Si no quedó como esperabas, cambiamos la talla sin vueltas."
+          }
+        },
+        "b3": {
+          "type": "column",
+          "settings": {
+            "title": "Envíos a todo el país",
+            "text": "Montevideo en 24-48 h. Retiro sin cargo coordinando por Instagram."
+          }
+        }
+      },
+      "block_order": [
+        "b1",
+        "b2",
+        "b3"
+      ],
+      "settings": {
+        "title": "",
+        "heading_size": "h2",
+        "image_width": "full",
+        "image_radius": 0,
+        "columns_desktop": 3,
+        "column_alignment": "left",
+        "color_scheme": "scheme-1",
+        "padding_top": 36,
+        "padding_bottom": 44
+      }
+    }
+  },
+  "order": [
+    "hero_text",
+    "featured_collection",
+    "values"
+  ]
+}
