@@ -13,11 +13,15 @@
   scrollbar-width: thin;
 }
 .melva-tryon-x {
-  position: absolute; right: 4px; top: 4px; background: none; border: 0;
+  position: absolute; right: 4px; top: 4px; background: rgba(255, 255, 255, .82); border: 0; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,.15);
   width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
   font-size: 17px; cursor: pointer; color: inherit; line-height: 1;
 }
-.melva-tryon-title { margin: 0 0 5px; font-size: 20px; line-height: 1.2; }
+.melva-tryon-title {
+  margin: 0 0 5px; font-size: 20px; line-height: 1.2;
+  font-family: var(--font-heading-family, inherit); font-weight: 500;
+  letter-spacing: normal; text-transform: none; text-wrap: balance;
+}
 .melva-tryon-sub { margin: 0 0 14px; font-size: 14px; line-height: 1.45; opacity: .75; }
 
 .melva-tryon-dropzone {
@@ -45,6 +49,8 @@
   position: sticky; bottom: -18px; background: #fff;
   padding: 10px 0 6px; box-shadow: 0 -6px 14px rgba(0, 0, 0, .07);
 }
+.melva-tryon-actions-row--share { justify-content: flex-start; }
+.melva-tryon-share { flex: 1; font-weight: 500; }
 .melva-tryon-actions-row { display: flex; gap: 8px; justify-content: center; }
 .melva-tryon-ghost {
   background: none; border: 1px solid rgba(0, 0, 0, .2); border-radius: 8px;

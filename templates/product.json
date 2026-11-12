@@ -94,7 +94,7 @@
       "type": "melva-tryon",
       "settings": {
         "enabled": true,
-        "endpoint": "",
+        "endpoint": "https://us-central1-melva-tryon.cloudfunctions.net/tryon",
         "button_label": "Probatelo",
         "modal_title": "Probatelo",
         "modal_help": "Subí una foto tuya y te mostramos con esta prenda puesta.",

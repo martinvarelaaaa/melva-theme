@@ -259,6 +259,32 @@
       });
   });
 
+  /* ---------- compartir look ---------- */
+  root.querySelector('[data-tryon-share]').addEventListener('click', function () {
+    if (!resultImg.src || !resultImg.src.startsWith('data:')) return;
+    fetch(resultImg.src)
+      .then(function (r) { return r.blob(); })
+      .then(function (blob) {
+        var file = new File([blob], 'melva-probador.png', { type: 'image/png' });
+        var nav = navigator;
+        if (nav.canShare && nav.canShare({ files: [file] })) {
+          return nav.share({
+            files: [file],
+            title: root.dataset.productTitle,
+            text: 'Mirá cómo me queda: ' + root.dataset.productTitle
+          }).catch(function () {});
+        }
+        var a = document.createElement('a');
+        a.href = resultImg.src;
+        a.download = 'melva-probador.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      })
+      .catch(function () {});
+    track('tryon_share');
+  });
+
   /* ---------- métricas ---------- */
   function track(ev) {
     try {
