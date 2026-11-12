@@ -145,7 +145,32 @@ window.MELVA_COLORS = {
     });
   }
 
-  if (document.querySelector('.product__media-list')) pdp();
+  /* preselección desde la colección: ?variant=ID -> marcar color+talle en Dawn */
+  function preselectFromUrl() {
+    var vid = parseInt(new URLSearchParams(location.search).get('variant'), 10);
+    if (!vid || !window.MELVA_COLORS) return;
+    var found = null;
+    window.MELVA_COLORS.products.forEach(function (p) {
+      p.colors.forEach(function (col) {
+        col.sizes.forEach(function (s) { if (s.id === vid) found = { color: col.color, size: s.s }; });
+      });
+    });
+    if (!found) return;
+    var inputs = Array.prototype.slice.call(document.querySelectorAll('input[type="radio"]'));
+    var colorInput = inputs.filter(function (i) { return i.value === found.color && /color/i.test(i.name); })[0];
+    var sizeInput = inputs.filter(function (i) { return i.value === found.size && /talle|size/i.test(i.name); })[0];
+    if (colorInput && !colorInput.checked) { colorInput.checked = true; colorInput.dispatchEvent(new Event('change', { bubbles: true })); }
+    if (sizeInput && !sizeInput.checked) { sizeInput.checked = true; sizeInput.dispatchEvent(new Event('change', { bubbles: true })); }
+  }
+
+  if (document.querySelector('.product__media-list')) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () { pdp(); preselectFromUrl(); });
+    } else {
+      pdp();
+      preselectFromUrl();
+    }
+  }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', grids);
   } else {

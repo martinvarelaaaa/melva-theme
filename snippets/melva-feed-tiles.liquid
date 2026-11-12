@@ -1,66 +1,50 @@
 {%- comment -%}
   Tile del feed híbrido (sections/melva-tile-feed.liquid).
-  Card estilo producto con espíritu feed: foto COMPLETA (sin recorte), swipe
-  horizontal entre colores solo dentro de la foto (touch-action: pan-y),
-  nombre + color + precio debajo en texto oscuro, botón "+" flotante en la foto,
-  click → PDP con esa variación preseleccionada.
+  UNA CARD POR VARIACIÓN: foto de ese color, nombre + color + precio debajo,
+  "+" glass con hoja de talles, click → PDP con esa variación preseleccionada.
+  Foto en su proporción natural, fija en su espacio.
 {%- endcomment -%}
 {%- if feed_product.variants.size > 0 -%}
   {%- assign seen_colors = '' -%}
-  <li class="melva-feed__cell" data-handle="{{ feed_product.handle }}">
-    <div class="melva-tile__media">
-      <a href="{{ feed_product.url }}?variant={{ feed_product.variants.first.id }}" aria-label="{{ feed_product.title }} — ver producto">
-      <div class="melva-tile__scroller" data-scroller>
-        {%- for variant in feed_product.variants -%}
-          {%- assign this_color = variant.option1 | strip | append: ',' -%}
-          {%- unless seen_colors contains this_color -%}
-            {%- assign seen_colors = seen_colors | append: this_color -%}
-            {%- if variant.image -%}
+  {%- for variant in feed_product.variants -%}
+    {%- assign this_color = variant.option1 | strip | append: ',' -%}
+    {%- unless seen_colors contains this_color -%}
+      {%- assign seen_colors = seen_colors | append: this_color -%}
+      {%- if variant.image -%}
+      <li class="melva-feed__cell" data-handle="{{ feed_product.handle }}" data-color="{{ variant.option1 | strip }}">
+        <div class="melva-tile__media">
+          <a href="{{ feed_product.url }}?variant={{ variant.id }}" aria-label="{{ feed_product.title }} {{ variant.option1 | strip }} — ver producto">
+            {%- if feed_product.compare_at_price > feed_product.price -%}
+              {%- assign diff = feed_product.compare_at_price | minus: feed_product.price -%}
+              {%- assign pct = diff | times: 100 | divided_by: feed_product.compare_at_price -%}
+              <span class="melva-feed__badge">-{{ pct }}%</span>
+            {%- endif -%}
             <img
               class="melva-tile__img"
-              data-color="{{ variant.option1 | strip }}"
-              data-vid="{{ variant.id }}"
               src="{{ variant.image | image_url: width: 720 }}"
               srcset="{{ variant.image | image_url: width: 360 }} 360w, {{ variant.image | image_url: width: 720 }} 720w, {{ variant.image | image_url: width: 1080 }} 1080w"
               sizes="(max-width: 767px) 50vw, (min-width: 768px) 33vw"
               alt="{{ feed_product.title }} {{ variant.option1 | strip }}"
-              width="720" height="960"
+              width="{{ variant.image.width }}"
+              height="{{ variant.image.height }}"
               loading="lazy"
               draggable="false"
             >
-            {%- endif -%}
-          {%- endunless -%}
-        {%- endfor -%}
-      </div>
-      {%- if feed_product.compare_at_price > feed_product.price -%}
-        {%- assign diff = feed_product.compare_at_price | minus: feed_product.price -%}
-        {%- assign pct = diff | times: 100 | divided_by: feed_product.compare_at_price -%}
-        <span class="melva-feed__badge">-{{ pct }}%</span>
-      {%- endif -%}
-      {%- assign n_colors = seen_colors | split: ',' | size -%}
-      {%- if n_colors > 1 -%}
-        <div class="melva-tile__dots" aria-hidden="true">
-          {%- for i in (1..n_colors) -%}
-            <span class="melva-tile__dot{% if forloop.first %} is-on{% endif %}"></span>
-          {%- endfor -%}
+          </a>
+          <button
+            type="button"
+            class="melva-feed__plus"
+            data-qs-open
+            aria-label="Agregar {{ feed_product.title }} {{ variant.option1 | strip }} al carrito"
+          >+</button>
         </div>
+        <div class="melva-tile__info">
+          <span class="melva-tile__name">{{ feed_product.title }} {{ variant.option1 | strip }}</span>
+          <span class="melva-tile__price">{{ feed_product.price | money }}</span>
+        </div>
+      </li>
+      {%- assign tile_count = tile_count | plus: 1 -%}
       {%- endif -%}
-      </a>
-      {%- if n_colors > 1 -%}
-        <button type="button" class="melva-tile__nav melva-tile__nav--prev" data-tile-prev aria-label="Color anterior">‹</button>
-        <button type="button" class="melva-tile__nav melva-tile__nav--next" data-tile-next aria-label="Color siguiente">›</button>
-      {%- endif -%}
-      <button
-        type="button"
-        class="melva-feed__plus"
-        data-qs-open
-        aria-label="Agregar {{ feed_product.title }} al carrito"
-      >+</button>
-    </div>
-    <div class="melva-tile__info">
-      <span class="melva-tile__name" data-chip-color>{{ feed_product.title }} {{ feed_product.variants.first.option1 | strip }}</span>
-      <span class="melva-tile__price">{{ feed_product.price | money }}</span>
-    </div>
-  </li>
-  {%- assign tile_count = tile_count | plus: 1 -%}
+    {%- endunless -%}
+  {%- endfor -%}
 {%- endif -%}

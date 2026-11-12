@@ -31,7 +31,7 @@
         {%- for feed_product in feed_products limit: 40 -%}
           {%- if tile_count >= max_tiles -%}{%- break -%}{%- endif -%}
           {%- if sale_products contains feed_product.id -%}
-            {%- include 'melva-feed-tiles', feed_product: feed_product -%}
+            {%- render 'melva-feed-tiles', feed_product: feed_product, feed_offset: forloop.index0, max_tiles: max_tiles -%}
           {%- endif -%}
         {%- endfor -%}
       {%- endif -%}
@@ -39,7 +39,7 @@
         {%- for feed_product in feed_products limit: 40 -%}
           {%- if tile_count >= max_tiles -%}{%- break -%}{%- endif -%}
           {%- unless feed_round == 1 and section.settings.prioritize_sale and sale_products contains feed_product.id -%}
-            {%- include 'melva-feed-tiles', feed_product: feed_product -%}
+            {%- render 'melva-feed-tiles', feed_product: feed_product, feed_offset: forloop.index0, max_tiles: max_tiles -%}
           {%- endunless -%}
         {%- endfor -%}
       {%- endif -%}
@@ -238,19 +238,9 @@
         .then(function () { btn.textContent = 'Agregar al carrito'; btn.disabled = false; });
     });
 
-    /* swipe por color en cada tile */
-    Array.prototype.forEach.call(cells, bindScroller);
 
-    /* flechas desktop: mover colores izq-der con click */
-    document.addEventListener('click', function (e) {
-      var nav = e.target.closest('[data-tile-prev], [data-tile-next]');
-      if (!nav) return;
-      e.preventDefault();
-      var li = nav.closest('.melva-feed__cell');
-      var sc = li && li.querySelector('[data-scroller]');
-      if (!sc) return;
-      sc.scrollBy({ left: nav.hasAttribute('data-tile-next') ? sc.clientWidth : -sc.clientWidth, behavior: 'smooth' });
-    });
+
+
 
     /* delegación para los botones + de cada tile */
     document.addEventListener('click', function (e) {
@@ -261,7 +251,7 @@
       var li = plus.closest('.melva-feed__cell');
       var item = window.MELVA_FEED.items.filter(function (x) { return x.h === li.dataset.handle; })[0];
       if (!item) return;
-      var activeColor = li.dataset.activeColor || item.c[0].color;
+      var activeColor = li.dataset.color || item.c[0].color;
       if (item.c.length === 1 && item.c[0].sizes.length === 1) {
         /* única variación: agregar directo (con anti doble-tap) */
         if (plus.dataset.busy) return;
@@ -334,50 +324,18 @@
 .melva-tile__media {
   position: relative;
   overflow: hidden;
-  border-radius: 10px;
   background: #f6f5f3;
 }
-.melva-tile__scroller {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  aspect-ratio: 3 / 4;
-  overscroll-behavior-x: contain;
-  touch-action: pan-y;  /* el scroll vertical de la página NUNCA lo secuestra; el swipe horizontal mueve la foto */
-}
-.melva-tile__scroller::-webkit-scrollbar { display: none; }
 .melva-tile__img {
   width: 100%;
-  flex: 0 0 100%;
-  object-fit: cover;   /* la foto llena y queda fija en su espacio */
+  height: auto;   /* proporción natural: la foto entera, fija, sin recorte */
   display: block;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-.melva-feed__cell a:hover .melva-tile__img,
-.melva-feed__cell a:focus-visible .melva-tile__img {
-  transform: scale(1.03);
+.melva-tile__media {
+  position: relative;
+  overflow: hidden;
+  background: #f6f5f3;
 }
-.melva-tile__dots {
-  position: absolute;
-  bottom: 8px;
-  left: 0;
-  right: 0;
-  z-index: 2;
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-  pointer-events: none;
-}
-.melva-tile__dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: rgba(18, 18, 18, .28);
-}
-.melva-tile__dot.is-on { background: #121212; }
 /* flechas de color (desktop): aparecen al pasar el mouse, sutiles */
 .melva-tile__nav {
   display: none;
@@ -486,7 +444,7 @@
 .melva-qs__backdrop { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, .6); display: block !important; }
 .melva-qs__card {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  background: #fff; border-radius: 14px; padding: 20px 18px 18px;
+  background: #fff; padding: 20px 18px 18px;
   width: min(92vw, 360px); max-height: 90vh; overflow: auto;
   box-shadow: 0 18px 60px rgba(0, 0, 0, .35);
 }
@@ -495,7 +453,7 @@
   width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
   font-size: 17px; cursor: pointer; color: #121212; box-shadow: 0 1px 4px rgba(0, 0, 0, .15);
 }
-.melva-qs__img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px; display: block; margin-bottom: 12px; }
+.melva-qs__img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; margin-bottom: 12px; }
 .melva-qs__title { margin: 0 0 4px; font-size: 16px; font-weight: 600; color: #121212; }
 .melva-qs__price { margin: 0 0 14px; font-size: 13.5px; color: #5f5f5f; }
 .melva-qs__sizes { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -511,7 +469,7 @@
 @media (max-width: 767px) {
   .melva-feed { padding: 2px 0 64px; }
   .melva-feed__grid { grid-template-columns: repeat(2, 1fr); gap: 2px; padding: 0 2px; }
-  .melva-qs__card { left: 0; right: 0; top: auto; bottom: 0; transform: none; width: 100%; max-width: none; border-radius: 14px 14px 0 0; }
+  .melva-qs__card { left: 0; right: 0; top: auto; bottom: 0; transform: none; width: 100%; max-width: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .melva-feed--ready .melva-feed__cell { opacity: 1; transform: none; transition: none; }
