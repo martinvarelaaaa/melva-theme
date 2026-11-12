@@ -26,10 +26,14 @@
   var currentVariantId = null;
   var generating = false;
 
+  /* El modal vive en <body>: Dawn pone transforms en .product__info-wrapper y eso
+     captura position:fixed (el modal queda atrapado en la columna y el backdrop no cubre). */
+  if (modal && modal.parentElement !== document.body) document.body.appendChild(modal);
+
   /* ---------- helpers ---------- */
   var LIVE_TEXT = {
     upload: 'Elegí una foto para probarte la prenda',
-    loading: 'Generando tu prueba. Suele tardar entre 15 y 20 segundos',
+    loading: 'Vistiéndote… suele tardar entre 15 y 20 segundos',
     result: 'Listo, así te queda la prenda',
     error: 'Hubo un problema. Podés intentar de nuevo',
     added: 'Prenda agregada al carrito'
@@ -130,10 +134,10 @@
     if (dropzoneHint) dropzoneHint.textContent = HINT_DEFAULT;
   }
 
-  root.querySelector('[data-tryon-pick]').addEventListener('click', function () {
+  modal.querySelector('[data-tryon-pick]').addEventListener('click', function () {
     fileInput.click();
   });
-  root.querySelector('[data-tryon-pick]').addEventListener('keydown', function (e) {
+  modal.querySelector('[data-tryon-pick]').addEventListener('keydown', function (e) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
   });
   fileInput.addEventListener('change', function () {
@@ -152,7 +156,7 @@
 
   goBtn.addEventListener('click', generate);
 
-  root.querySelectorAll('[data-tryon-retry]').forEach(function (b) {
+  modal.querySelectorAll('[data-tryon-retry]').forEach(function (b) {
     b.addEventListener('click', function () {
       var keepWork = !steps.error.hidden; /* 'Intentar de nuevo' tras un error: conserva foto y consentimiento */
       show('upload');
@@ -217,7 +221,7 @@
 
   /* CTA del resultado con precio del variant activo */
   function updateCartLabel() {
-    var cartBtn = root.querySelector('[data-tryon-cart]');
+    var cartBtn = modal.querySelector('[data-tryon-cart]');
     if (!cartBtn) return;
     var price = '';
     try {
@@ -236,7 +240,7 @@
   }
 
   /* ---------- carrito ---------- */
-  root.querySelector('[data-tryon-cart]').addEventListener('click', function () {
+  modal.querySelector('[data-tryon-cart]').addEventListener('click', function () {
     if (!currentVariantId) {
       window.location.href = '/cart';
       return;
@@ -260,7 +264,7 @@
   });
 
   /* ---------- compartir look ---------- */
-  root.querySelector('[data-tryon-share]').addEventListener('click', function () {
+  modal.querySelector('[data-tryon-share]').addEventListener('click', function () {
     if (!resultImg.src || !resultImg.src.startsWith('data:')) return;
     fetch(resultImg.src)
       .then(function (r) { return r.blob(); })

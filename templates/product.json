@@ -38,6 +38,12 @@
           "settings": {
             "share_label": "Compartir"
           }
+        },
+        "melva_tryon": {
+          "type": "custom_liquid",
+          "settings": {
+            "custom_liquid": "{% render 'melva-tryon-widget' %}"
+          }
         }
       },
       "block_order": [
@@ -46,6 +52,7 @@
         "variant_picker",
         "quantity_selector",
         "buy_buttons",
+        "melva_tryon",
         "description",
         "share"
       ],
@@ -89,26 +96,10 @@
         "padding_top": 36,
         "padding_bottom": 28
       }
-    },
-    "melva-tryon": {
-      "type": "melva-tryon",
-      "settings": {
-        "enabled": true,
-        "endpoint": "https://us-central1-melva-tryon.cloudfunctions.net/tryon",
-        "button_label": "Probatelo",
-        "modal_title": "Probatelo",
-        "modal_help": "Subí una foto tuya y te mostramos con esta prenda puesta.",
-        "consent_text": "Acepto que mi foto se use solo para generar esta imagen y no se guarde.",
-        "generate_label": "Ver cómo me queda",
-        "loading_text": "Estamos vistiéndote…",
-        "cart_label": "Agregar al carrito",
-        "added_label": "Agregado al carrito"
-      }
     }
   },
   "order": [
     "main",
-    "melva-tryon",
     "disclosures",
     "related-products"
   ]
