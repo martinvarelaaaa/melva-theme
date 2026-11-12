@@ -1,0 +1,53 @@
+/* Melva Probador Virtual — estilos */
+.melva-tryon-root { margin: 1rem 0; }
+.melva-tryon-root .melva-tryon-open { margin-bottom: 1rem; }
+
+.melva-tryon-modal { position: fixed; inset: 0; z-index: 1000; }
+.melva-tryon-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+.melva-tryon-card {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  background: var(--color-background, #fff); color: var(--color-foreground, #121212);
+  border-radius: 14px; padding: 1.5rem; width: min(92vw, 420px); max-height: 92vh; overflow: auto;
+  box-shadow: 0 18px 60px rgba(0,0,0,.35);
+}
+.melva-tryon-x {
+  position: absolute; right: .6rem; top: .6rem; background: none; border: 0;
+  font-size: 1.1rem; cursor: pointer; color: inherit; line-height: 1;
+}
+.melva-tryon-title { margin: 0 0 .35rem; font-size: 1.25rem; }
+.melva-tryon-sub { margin: 0 0 1rem; font-size: .9rem; opacity: .75; }
+
+.melva-tryon-dropzone {
+  border: 1.5px dashed rgba(0,0,0,.25); border-radius: 12px;
+  display: flex; flex-direction: column; align-items: center; gap: .3rem;
+  padding: 1.4rem .8rem; cursor: pointer; text-align: center; margin-bottom: 1rem;
+}
+.melva-tryon-dropzone:hover, .melva-tryon-dropzone:focus { border-color: rgba(0,0,0,.5); }
+.melva-tryon-dropzone-emoji { font-size: 1.6rem; }
+.melva-tryon-dropzone-text { font-weight: 600; }
+.melva-tryon-dropzone-hint { font-size: .78rem; opacity: .65; }
+
+.melva-tryon-consent { display: flex; gap: .5rem; font-size: .78rem; opacity: .8; margin-bottom: 1rem; cursor: pointer; }
+.melva-tryon-consent input { margin-top: .15rem; }
+
+.melva-tryon-actions { display: flex; flex-direction: column; gap: .6rem; margin-top: 1rem; }
+.melva-tryon-actions-row { display: flex; gap: .6rem; justify-content: center; }
+.melva-tryon-ghost {
+  background: none; border: 1px solid rgba(0,0,0,.2); border-radius: 8px;
+  padding: .55rem 1rem; font: inherit; cursor: pointer; color: inherit; text-decoration: none;
+}
+.melva-tryon-ghost:hover { border-color: rgba(0,0,0,.45); }
+
+.melva-tryon-result-img { width: 100%; border-radius: 10px; display: block; }
+.melva-tryon-loading-text, .melva-tryon-error-text, .melva-tryon-added-text { text-align: center; margin: 1rem 0; }
+.melva-tryon-error-text { font-size: .9rem; }
+
+.melva-tryon-shimmer {
+  height: 320px; border-radius: 10px;
+  background: linear-gradient(100deg, rgba(0,0,0,.06) 30%, rgba(0,0,0,.12) 50%, rgba(0,0,0,.06) 70%);
+  background-size: 200% 100%;
+  animation: melva-shimmer 1.4s infinite linear;
+}
+@keyframes melva-shimmer { to { background-position: -200% 0; } }
+
+body.melva-tryon-locked { overflow: hidden; }
