@@ -13,18 +13,6 @@
 
 {%- if feed_products.size > 0 -%}
 <section class="melva-feed">
-  <div class="melva-feed__head page-width">
-    <div>
-      {%- if section.settings.heading != blank -%}
-        <h2 class="melva-feed__heading">{{ section.settings.heading }}</h2>
-      {%- endif -%}
-      {%- if section.settings.subheading != blank -%}
-        <p class="melva-feed__sub">{{ section.settings.subheading }}</p>
-      {%- endif -%}
-    </div>
-    <a class="melva-feed__viewall" href="{{ routes.all_products_collection_url }}">Ver todo</a>
-  </div>
-
   <ul class="melva-feed__grid" role="list">
     {%- assign tile_count = 0 -%}
     {%- assign sale_products = '' -%}
@@ -87,12 +75,12 @@
             sizes: [
               {%- for v2 in product.variants -%}
                 {%- if v2.option1 != variant.option1 -%}{%- continue -%}{%- endif -%}
-                { id: {{ v2.id }}, s: {{ v2.option2 | json }}, a: {{ v2.available | json }} }{% unless forloop.last %},{% endunless %}
+                { id: {{ v2.id }}, s: {{ v2.option2 | json }}, a: {{ v2.available | json }} },
               {%- endfor -%}
-            ] }
+            ] },
         {%- endunless -%}
       {%- endfor -%}
-    ] }{% unless forloop.last %},{% endunless %}
+    ] },
     {%- endfor -%}
   ] };
 
@@ -279,17 +267,8 @@
 
 {% style %}
 .melva-feed {
-  padding: 8px 0 88px;
+  padding: 3px 0 88px;
   background: #ffffff;
-}
-.melva-feed__head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 22px;
-  padding-left: max(var(--page-margin, 24px), 4vw);
-  padding-right: max(var(--page-margin, 24px), 4vw);
 }
 .melva-feed__heading {
   margin: 0 0 4px;
@@ -305,16 +284,6 @@
   font-size: 0.9375rem;
   line-height: 1.5;
 }
-.melva-feed__viewall {
-  color: #1a1a1a;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  text-decoration: none;
-  border-bottom: 1px solid rgba(26, 26, 26, .25);
-  padding-bottom: 2px;
-  white-space: nowrap;
-}
-.melva-feed__viewall:hover { border-color: #1a1a1a; }
 .melva-feed__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -491,8 +460,7 @@
 .melva-qs__add { margin-bottom: 8px; }
 .melva-qs__done { text-align: center; font-size: 13.5px; color: #1a7a2e; margin: 4px 0 0; }
 @media (max-width: 767px) {
-  .melva-feed { padding: 4px 0 64px; }
-  .melva-feed__head { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .melva-feed { padding: 2px 0 64px; }
   .melva-feed__grid { grid-template-columns: repeat(2, 1fr); gap: 3px; }
   .melva-feed__overlay { opacity: 1; background: linear-gradient(to top, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0) 60%); }
   .melva-feed__meta { padding: 7px 8px; }
