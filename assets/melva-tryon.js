@@ -63,22 +63,52 @@
   }
 
   function downscale(file, cb) {
+    /* iOS-safe: las fotos de camara moderna (48MP) rompen el canvas de un paso.
+       Dos pasos + verificacion + feedback de error visible. */
+    var hint = root.querySelector('.melva-tryon-dropzone-hint');
     var reader = new FileReader();
     reader.onload = function () {
       var img = new Image();
+      img.onerror = function () {
+        if (hint) hint.textContent = 'Esa foto no se pudo abrir. Probá con otra 🙏';
+        cb(null, null);
+      };
       img.onload = function () {
-        var MAX = 768;
-        var scale = Math.min(1, MAX / Math.max(img.width, img.height));
-        var w = Math.round(img.width * scale);
-        var h = Math.round(img.height * scale);
-        var canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        cb(dataUrl.split(',')[1], dataUrl);
+        try {
+          var MAX = 768;
+          var w = img.naturalWidth, h = img.naturalHeight;
+          var scale = Math.min(1, MAX / Math.max(w, h));
+          var cw = Math.round(w * scale);
+          var ch = Math.round(h * scale);
+          var canvas = document.createElement('canvas');
+          canvas.width = cw;
+          canvas.height = ch;
+          var ctx = canvas.getContext('2d');
+          if (Math.max(w, h) > 3000) {
+            /* paso intermedio a la mitad hasta bajar de 2000px (limite practico de iOS) */
+            var mw = Math.round(w / 2), mh = Math.round(h / 2);
+            while (Math.max(mw, mh) > 2000) { mw = Math.round(mw / 2); mh = Math.round(mh / 2); }
+            var mid = document.createElement('canvas');
+            mid.width = mw;
+            mid.height = mh;
+            mid.getContext('2d').drawImage(img, 0, 0, mw, mh);
+            ctx.drawImage(mid, 0, 0, cw, ch);
+          } else {
+            ctx.drawImage(img, 0, 0, cw, ch);
+          }
+          var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          if (!dataUrl || dataUrl.length < 2000) throw new Error('canvas_vacio');
+          cb(dataUrl.split(',')[1], dataUrl);
+        } catch (e) {
+          if (hint) hint.textContent = 'Esa foto no se pudo procesar. Probá con otra 🙏';
+          cb(null, null);
+        }
       };
       img.src = reader.result;
+    };
+    reader.onerror = function () {
+      if (hint) hint.textContent = 'No pudimos leer la foto. Probá con otra 🙏';
+      cb(null, null);
     };
     reader.readAsDataURL(file);
   }
@@ -142,11 +172,15 @@
   });
   fileInput.addEventListener('change', function () {
     if (!fileInput.files || !fileInput.files[0]) return;
+    var hint = root.querySelector('.melva-tryon-dropzone-hint');
+    if (hint) hint.textContent = 'Procesando foto…';
+    userImageB64 = null;
+    updateGo();
     downscale(fileInput.files[0], function (b64) {
-      userImageB64 = b64;
+      userImageB64 = b64 || null;
       updateGo();
-      var hint = root.querySelector('.melva-tryon-dropzone-hint');
-      hint.textContent = '✓ Foto cargada — podés cambiarla si querés';
+      if (b64 && hint) hint.textContent = '✓ Foto cargada — podés cambiarla si querés';
+      /* si falla, downscale ya dejó el mensaje de error y el botón sigue deshabilitado */
     });
   });
   consent.addEventListener('change', updateGo);

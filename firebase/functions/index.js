@@ -25,6 +25,7 @@ const DEFAULTS = {
 Reglas:
 - Preserva EXACTAMENTE el rostro, cabello, tono de piel, pose y fondo de la imagen 1. No cambies el rostro ni agregues accesorios nuevos.
 - Reemplaza unicamente la prenda indicada: {category_instructions}
+- La persona DEBE terminar usando la prenda de la imagen 2 en lugar de la suya. Si lleva otra prenda superpuesta en esa zona, quitasela y coloca la nueva en su lugar. NUNCA devuelvas la imagen sin el cambio de prenda: si no aplicaste la prenda, la salida es un error.
 - Fidelidad absoluta al color, estampado, textura y largo de la prenda de la imagen 2.
 - Ajusta la prenda al cuerpo de la persona de forma natural y realista (drapeado, arrugas, sombras coherentes con la luz de la imagen 1).
 - Salida fotorrealista, sin texto, sin marcas de agua, sin bordes.`,
