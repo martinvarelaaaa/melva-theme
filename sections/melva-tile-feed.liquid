@@ -306,20 +306,31 @@
   display: block;
   overflow: hidden;
 }
+.melva-feed__cell a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.melva-tile__media {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #f6f5f3;
+}
 .melva-tile__scroller {
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3 / 4;
   overscroll-behavior-x: contain;
+  touch-action: pan-y;  /* el scroll vertical de la página NUNCA lo secuestra; el swipe horizontal mueve la foto */
 }
 .melva-tile__scroller::-webkit-scrollbar { display: none; }
 .melva-tile__img {
   width: 100%;
   flex: 0 0 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  object-fit: contain;   /* foto entera, sin recorte */
   display: block;
   scroll-snap-align: start;
   scroll-snap-stop: always;
@@ -327,24 +338,68 @@
 }
 .melva-feed__cell a:hover .melva-tile__img,
 .melva-feed__cell a:focus-visible .melva-tile__img {
-  transform: scale(1.07);
+  transform: scale(1.03);
 }
 .melva-tile__dots {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  bottom: 8px;
+  left: 0;
+  right: 0;
   z-index: 2;
   display: flex;
+  justify-content: center;
   gap: 4px;
+  pointer-events: none;
 }
 .melva-tile__dot {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, .55);
-  box-shadow: 0 0 3px rgba(0, 0, 0, .25);
+  background: rgba(18, 18, 18, .28);
 }
-.melva-tile__dot.is-on { background: #ffffff; }
+.melva-tile__dot.is-on { background: #121212; }
+/* info debajo de la foto: legible siempre, sobre blanco */
+.melva-tile__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 2px 12px;
+}
+.melva-tile__name {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #121212;
+}
+.melva-tile__price {
+  font-size: 12.5px;
+  color: #3d3d3d;
+}
+/* el + vive en la esquina de la FOTO (no tapa el nombre) */
+.melva-tile__media .melva-feed__plus {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 3;
+}
+.melva-feed__plus {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .92);
+  color: #121212;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.melva-feed__plus:hover { transform: scale(1.08); background: #fff; }
 /* entrada al scroll: fade + rise con delay/offset aleatorios.
    Fail-safe: la animación solo se activa cuando el JS agrega .melva-feed--ready;
    sin JS (o si el JS falla) el feed es completamente visible. */
@@ -371,78 +426,7 @@
   letter-spacing: 0.04em;
   line-height: 1.2;
 }
-.melva-feed__overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: flex-end;
-  opacity: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 55%);
-  transition: opacity 0.25s ease;
-  pointer-events: none;
-}
-.melva-feed__cell a:hover .melva-feed__overlay,
-.melva-feed__cell a:focus-visible .melva-feed__overlay {
-  opacity: 1;
-}
-.melva-feed__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 10px 12px;
-  color: #ffffff;
-  width: 100%;
-}
-.melva-feed__title {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  line-height: 1.3;
-}
-.melva-feed__price {
-  font-size: 0.75rem;
-  opacity: 0.85;
-}
-.melva-feed__price s {
-  opacity: 0.6;
-  margin-right: 4px;
-}
-/* chip de precio siempre visible (discreto) + botón + */
-.melva-feed__chip {
-  position: absolute;
-  left: 8px;
-  bottom: 8px;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  color: #fff;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, .45);
-  pointer-events: none;
-}
-.melva-feed__chip-t { font-size: 0.6875rem; font-weight: 600; line-height: 1.25; }
-.melva-feed__chip-p { font-size: 0.6563rem; opacity: .92; }
-.melva-feed__plus {
-  position: absolute;
-  right: 8px;
-  bottom: 8px;
-  z-index: 3;
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, .92);
-  color: #121212;
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease, background 0.2s ease;
-}
-.melva-feed__plus:hover { transform: scale(1.08); background: #fff; }
+
 /* hoja de quick-add */
 .melva-qs { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000; }
 .melva-qs__backdrop { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, .6); display: block !important; }
@@ -472,15 +456,8 @@
 .melva-qs__done { text-align: center; font-size: 13.5px; color: #1a7a2e; margin: 4px 0 0; }
 @media (max-width: 767px) {
   .melva-feed { padding: 2px 0 64px; }
-  .melva-feed__grid { grid-template-columns: repeat(2, 1fr); gap: 3px; }
-  .melva-feed__overlay { opacity: 1; background: linear-gradient(to top, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0) 60%); }
-  .melva-feed__meta { padding: 7px 8px; }
-  .melva-feed__title { font-size: 0.6875rem; }
-  .melva-feed__price { font-size: 0.6563rem; }
+  .melva-feed__grid { grid-template-columns: repeat(2, 1fr); gap: 10px 8px; padding: 0 8px; }
   .melva-qs__card { left: 50%; right: auto; top: auto; bottom: 0; transform: none; width: 100%; max-width: none; border-radius: 14px 14px 0 0; }
-}
-@media (hover: none) {
-  .melva-feed__overlay { opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .melva-feed--ready .melva-feed__cell { opacity: 1; transform: none; transition: none; }
