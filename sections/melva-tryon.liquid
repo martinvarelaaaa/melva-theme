@@ -20,6 +20,7 @@
     data-product-img="{{ tryon_img }}"
     data-variant-id="{{ product.selected_or_first_available_variant.id }}"
     data-added-label="{{ section.settings.added_label }}"
+    data-cart-label="{{ section.settings.cart_label }}"
   >
     <button
       type="button"
@@ -34,13 +35,14 @@
       <div class="melva-tryon-backdrop" data-tryon-close></div>
       <div class="melva-tryon-card">
         <button type="button" class="melva-tryon-x" data-tryon-close aria-label="Cerrar">✕</button>
+        <div class="visually-hidden" aria-live="polite" data-tryon-live></div>
 
         {%- comment -%} Paso 1: subida {%- endcomment -%}
         <div class="melva-tryon-step" data-step="upload">
           <h3 class="melva-tryon-title">{{ section.settings.modal_title }}</h3>
           <p class="melva-tryon-sub">{{ section.settings.modal_help }}</p>
           <div class="melva-tryon-dropzone" data-tryon-pick tabindex="0" role="button" aria-label="Elegir foto">
-            <span class="melva-tryon-dropzone-emoji">📷</span>
+            <span class="melva-tryon-dropzone-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v12H4z" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.6"/></svg></span>
             <span class="melva-tryon-dropzone-text">Tocá para elegir una foto</span>
             <span class="melva-tryon-dropzone-hint">De pie, buena luz, ropa ajustada al cuerpo</span>
           </div>

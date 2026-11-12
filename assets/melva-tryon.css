@@ -1,60 +1,72 @@
-/* Melva Probador Virtual — estilos */
-.melva-tryon-root { margin: 1rem 0; }
-.melva-tryon-root .melva-tryon-open { margin-bottom: 1rem; }
+/* Melva Probador Virtual — estilos (sizing en px: este theme compila 1rem ≈ 10px) */
+.melva-tryon-root { margin: 10px 0; }
+.melva-tryon-root .melva-tryon-open { margin-bottom: 10px; }
 
 .melva-tryon-modal { position: fixed; inset: 0; z-index: 1000; }
-.melva-tryon-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+.melva-tryon-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .55); }
 .melva-tryon-card {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
   background: #fff; color: var(--color-foreground, #121212);
-  border-radius: 14px; padding: 1.5rem; width: min(92vw, 420px); max-height: 92vh; overflow: auto;
-  box-shadow: 0 18px 60px rgba(0,0,0,.35);
+  border-radius: 14px; padding: 22px 18px 18px;
+  width: min(92vw, 420px); max-height: 92vh; overflow: auto;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, .35);
+  scrollbar-width: thin;
 }
 .melva-tryon-x {
-  position: absolute; right: .4rem; top: .4rem; background: none; border: 0;
+  position: absolute; right: 4px; top: 4px; background: none; border: 0;
   width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
-  font-size: 1.15rem; cursor: pointer; color: inherit; line-height: 1;
+  font-size: 17px; cursor: pointer; color: inherit; line-height: 1;
 }
-.melva-tryon-title { margin: 0 0 .35rem; font-size: 1.25rem; }
-.melva-tryon-sub { margin: 0 0 1rem; font-size: .9rem; opacity: .75; }
+.melva-tryon-title { margin: 0 0 5px; font-size: 20px; line-height: 1.2; }
+.melva-tryon-sub { margin: 0 0 14px; font-size: 14px; line-height: 1.45; opacity: .75; }
 
 .melva-tryon-dropzone {
-  border: 1.5px dashed rgba(0,0,0,.25); border-radius: 12px;
-  display: flex; flex-direction: column; align-items: center; gap: .3rem;
-  padding: 1.4rem .8rem; cursor: pointer; text-align: center; margin-bottom: 1rem;
+  border: 1.5px dashed rgba(0, 0, 0, .3); border-radius: 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 22px 10px; cursor: pointer; text-align: center; margin-bottom: 14px;
 }
-.melva-tryon-dropzone:hover, .melva-tryon-dropzone:focus { border-color: rgba(0,0,0,.5); }
-.melva-tryon-dropzone-emoji { font-size: 1.6rem; }
-.melva-tryon-dropzone-text { font-weight: 600; }
-.melva-tryon-dropzone-hint { font-size: .78rem; opacity: .65; }
+.melva-tryon-dropzone:hover, .melva-tryon-dropzone:focus-visible { border-color: rgba(0, 0, 0, .55); outline: 2px solid rgba(0, 0, 0, .2); outline-offset: 2px; }
+.melva-tryon-dropzone-emoji { font-size: 24px; line-height: 1; display: inline-flex; }
+.melva-tryon-dropzone-emoji svg { width: 26px; height: 26px; }
+.melva-tryon-dropzone-text { font-weight: 600; font-size: 15px; }
+.melva-tryon-dropzone-hint { font-size: 12.5px; opacity: .7; color: var(--color-foreground, #121212); }
 
 .melva-tryon-consent {
-  display: flex; gap: .55rem; font-size: .8rem; opacity: .85;
-  margin-bottom: 1rem; cursor: pointer; align-items: flex-start;
-  padding: .55rem 0;
+  display: flex; gap: 8px; font-size: 13px; opacity: .9;
+  margin-bottom: 14px; cursor: pointer; align-items: flex-start;
+  padding: 8px 0;
 }
 .melva-tryon-consent input {
-  width: 20px; height: 20px; margin-top: .1rem; flex: 0 0 auto; accent-color: currentColor;
+  width: 20px; height: 20px; margin-top: 1px; flex: 0 0 auto; accent-color: currentColor;
 }
 
-.melva-tryon-actions { display: flex; flex-direction: column; gap: .6rem; margin-top: 1rem; }
-.melva-tryon-actions-row { display: flex; gap: .6rem; justify-content: center; }
+.melva-tryon-actions {
+  display: flex; flex-direction: column; gap: 9px;
+  position: sticky; bottom: -18px; background: #fff;
+  padding: 10px 0 6px; box-shadow: 0 -6px 14px rgba(0, 0, 0, .07);
+}
+.melva-tryon-actions-row { display: flex; gap: 8px; justify-content: center; }
 .melva-tryon-ghost {
-  background: none; border: 1px solid rgba(0,0,0,.2); border-radius: 8px;
-  padding: .55rem 1rem; font: inherit; cursor: pointer; color: inherit; text-decoration: none;
+  background: none; border: 1px solid rgba(0, 0, 0, .2); border-radius: 8px;
+  padding: 6px 14px; min-height: 44px; min-width: 44px;
+  font: inherit; font-size: 14px; cursor: pointer; color: inherit; text-decoration: none;
+  display: inline-flex; align-items: center; justify-content: center;
 }
-.melva-tryon-ghost:hover { border-color: rgba(0,0,0,.45); }
+.melva-tryon-ghost:hover { border-color: rgba(0, 0, 0, .45); }
 
-.melva-tryon-result-img { width: 100%; border-radius: 10px; display: block; }
-.melva-tryon-loading-text, .melva-tryon-error-text, .melva-tryon-added-text { text-align: center; margin: 1rem 0; }
-.melva-tryon-error-text { font-size: .9rem; }
+.melva-tryon-result-img { display: block; margin: 0 auto; max-height: 56vh; width: auto; max-width: 100%; border-radius: 10px; object-fit: contain; }
+.melva-tryon-loading-text, .melva-tryon-error-text, .melva-tryon-added-text { text-align: center; margin: 14px 0; font-size: 14.5px; line-height: 1.4; }
+.melva-tryon-error-text { font-size: 13.5px; }
 
 .melva-tryon-shimmer {
   height: 320px; border-radius: 10px;
-  background: linear-gradient(100deg, rgba(0,0,0,.06) 30%, rgba(0,0,0,.12) 50%, rgba(0,0,0,.06) 70%);
+  background: linear-gradient(100deg, rgba(0, 0, 0, .06) 30%, rgba(0, 0, 0, .12) 50%, rgba(0, 0, 0, .06) 70%);
   background-size: 200% 100%;
   animation: melva-shimmer 1.4s infinite linear;
 }
 @keyframes melva-shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .melva-tryon-shimmer { animation: none; background: rgba(0, 0, 0, .08); }
+}
 
 body.melva-tryon-locked { overflow: hidden; }
