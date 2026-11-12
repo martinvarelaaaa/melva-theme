@@ -1,0 +1,51 @@
+{%- comment -%}
+  Tiles de un producto para el feed IG (sections/melva-tile-feed.liquid).
+  Recibe: feed_product. Emite UN tile por color (portada de cada variante),
+  con link directo a ese color. Actualiza tile_count del section padre.
+  Oferta: badge "-N%" + precio tachado en el overlay.
+{%- endcomment -%}
+{%- liquid
+  assign n_vars = feed_product.variants.size
+-%}
+{%- if n_vars > 0 -%}
+  {%- assign seen_colors = '' -%}
+  {%- for variant in feed_product.variants -%}
+    {%- if tile_count >= max_tiles -%}
+      {%- break -%}
+    {%- endif -%}
+    {%- assign this_color = variant.option1 | strip | append: ',' -%}
+    {%- unless seen_colors contains this_color -%}
+      {%- assign seen_colors = seen_colors | append: this_color -%}
+      {%- assign tile_count = tile_count | plus: 1 -%}
+      <li class="melva-feed__cell">
+        <a href="{{ feed_product.url }}?variant={{ variant.id }}" aria-label="{{ feed_product.title }} {{ variant.option1 }} — ver producto">
+          {%- if feed_product.compare_at_price > feed_product.price -%}
+            {%- assign diff = feed_product.compare_at_price | minus: feed_product.price -%}
+            {%- assign pct = diff | times: 100 | divided_by: feed_product.compare_at_price -%}
+            <span class="melva-feed__badge">-{{ pct }}%</span>
+          {%- endif -%}
+          {%- if variant.image -%}
+          <img
+            src="{{ variant.image | image_url: width: 720 }}"
+            srcset="{{ variant.image | image_url: width: 360 }} 360w, {{ variant.image | image_url: width: 720 }} 720w, {{ variant.image | image_url: width: 1080 }} 1080w"
+            sizes="(max-width: 767px) 50vw, (min-width: 768px) 33vw"
+            alt="{{ feed_product.title }} {{ variant.option1 }}"
+            width="720" height="720"
+            loading="lazy"
+          >
+          {%- endif -%}
+          <span class="melva-feed__overlay" aria-hidden="true">
+            <span class="melva-feed__meta">
+              <span class="melva-feed__title">{{ feed_product.title }} {{ variant.option1 }}</span>
+              {%- if feed_product.compare_at_price > feed_product.price -%}
+                <span class="melva-feed__price"><s>{{ feed_product.compare_at_price | money }}</s>{{ feed_product.price | money }}</span>
+              {%- elsif feed_product.price_min > 0 -%}
+                <span class="melva-feed__price">{{ feed_product.price_min | money }}</span>
+              {%- endif -%}
+            </span>
+          </span>
+        </a>
+      </li>
+    {%- endunless -%}
+  {%- endfor -%}
+{%- endif -%}
