@@ -1,0 +1,93 @@
+{%- comment -%}
+  Melva — Probador Virtual (widget)
+  Se renderiza dentro de main-product via bloque custom_liquid, justo después de los botones de compra.
+{%- endcomment -%}
+{%- if product -%}
+  {%- assign tryon_img = product.featured_media | image_url: width: 1024 -%}
+  <div
+    id="MelvaTryon"
+    class="melva-tryon-root"
+    data-endpoint="https://us-central1-melva-tryon.cloudfunctions.net/tryon"
+    data-product-handle="{{ product.handle }}"
+    data-product-title="{{ product.title | escape }}"
+    data-product-img="{{ tryon_img }}"
+    data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+    data-added-label="Agregado al carrito"
+    data-cart-label="Agregar al carrito"
+  >
+    <button
+      type="button"
+      class="melva-tryon-open button button--full-width button--secondary"
+      aria-haspopup="dialog"
+    >
+      <svg class="melva-tryon-cam" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v12H4z" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.6"/></svg>
+      Probador virtual
+    </button>
+
+    <div class="melva-tryon-modal" id="MelvaTryonModal" hidden role="dialog" aria-modal="true" aria-label="Probador virtual">
+      <div class="melva-tryon-backdrop" data-tryon-close></div>
+      <div class="melva-tryon-card">
+        <button type="button" class="melva-tryon-x" data-tryon-close aria-label="Cerrar">✕</button>
+        <div class="visually-hidden" aria-live="polite" data-tryon-live></div>
+
+        {%- comment -%} Paso 1: subida {%- endcomment -%}
+        <div class="melva-tryon-step" data-step="upload">
+          <h3 class="melva-tryon-title">Probador virtual</h3>
+          <p class="melva-tryon-sub">Probá la prenda con una foto tuya.</p>
+          <div class="melva-tryon-dropzone" data-tryon-pick tabindex="0" role="button" aria-label="Elegir foto">
+            <span class="melva-tryon-dropzone-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v12H4z" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.6"/></svg></span>
+            <span class="melva-tryon-dropzone-text">Tocá para elegir una foto</span>
+            <span class="melva-tryon-dropzone-hint">De pie, buena luz, ropa ajustada al cuerpo</span>
+          </div>
+          <input type="file" accept="image/*" class="melva-tryon-file" hidden>
+          <label class="melva-tryon-consent">
+            <input type="checkbox" id="MelvaTryonConsent">
+            <span>Mi foto solo se usa para esta imagen y no se guarda.</span>
+          </label>
+          <button type="button" class="melva-tryon-go button button--full-width" disabled data-tryon-go>
+            Ver cómo me queda
+          </button>
+        </div>
+
+        {%- comment -%} Paso 2: esperando {%- endcomment -%}
+        <div class="melva-tryon-step" data-step="loading" hidden>
+          <div class="melva-tryon-shimmer" aria-hidden="true"></div>
+          <p class="melva-tryon-loading-text">Vistiéndote…</p>
+        </div>
+
+        {%- comment -%} Paso 3: resultado {%- endcomment -%}
+        <div class="melva-tryon-step" data-step="result" hidden>
+          <img class="melva-tryon-result-img" alt="Probando {{ product.title | escape }}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+          <div class="melva-tryon-actions">
+            <button type="button" class="melva-tryon-add button button--full-width" data-tryon-cart>
+              Agregar al carrito
+            </button>
+            <div class="melva-tryon-actions-row">
+              <button type="button" class="melva-tryon-ghost melva-tryon-share" data-tryon-share>Compartir look</button>
+              <button type="button" class="melva-tryon-ghost" data-tryon-retry>Otra foto</button>
+              <button type="button" class="melva-tryon-ghost" data-tryon-close>Cerrar</button>
+            </div>
+          </div>
+        </div>
+
+        {%- comment -%} Paso 4: error {%- endcomment -%}
+        <div class="melva-tryon-step" data-step="error" hidden>
+          <p class="melva-tryon-error-text" data-tryon-error></p>
+          <button type="button" class="melva-tryon-ghost" data-tryon-retry>Intentar de nuevo</button>
+        </div>
+
+        {%- comment -%} Paso 5: agregado al carrito {%- endcomment -%}
+        <div class="melva-tryon-step" data-step="added" hidden>
+          <p class="melva-tryon-added-text" data-tryon-added-text>✓ Agregado al carrito</p>
+          <div class="melva-tryon-actions-row">
+            <a href="/cart" class="melva-tryon-ghost">Ver carrito</a>
+            <button type="button" class="melva-tryon-ghost" data-tryon-close>Seguir mirando</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{ 'melva-tryon.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'melva-tryon.js' | asset_url }}" defer></script>
+{%- endif -%}

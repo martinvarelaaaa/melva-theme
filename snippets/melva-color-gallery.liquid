@@ -1,0 +1,180 @@
+{%- comment -%}
+  Melva — Galería por color + cards por variación
+  1) PDP: al elegir color, el set de fotos de ese color aparece primero (en orden) y las
+     fotos generales de modelo quedan al final. Nada se pierde: todas las fotos siguen visibles.
+  2) Grids (home / colección): una card por cada variación de color, como la web vieja.
+{%- endcomment -%}
+
+<script>
+window.MELVA_COLORS = {
+  products: [
+    {%- for product in collections['all'].products -%}
+    {
+      handle: {{ product.handle | json }},
+      title: {{ product.title | json }},
+      colors: [
+        {%- for variant in product.variants -%}
+        {
+          color: {{ variant.option1 | json }},
+          id: {{ variant.id }},
+          img: {% if variant.image %}{{ variant.image | image_url: width: 720 | json }}{% else %}null{% endif %}
+        }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      ]
+    }{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ]
+};
+</script>
+
+<script>
+(function () {
+  'use strict';
+  var DATA = window.MELVA_COLORS;
+  if (!DATA) return;
+
+  /* ============ 1. PDP: galería por color ============ */
+  function pdp() {
+    var mediaList = document.querySelector('.product__media-list');
+    if (!mediaList) return;
+
+    function currentColor() {
+      var inputs = document.querySelectorAll('input[type="radio"]:checked');
+      for (var i = 0; i < inputs.length; i++) {
+        var name = (inputs[i].name || '').toLowerCase();
+        if (name.indexOf('color') !== -1 || name.indexOf('talle') !== -1 || name.indexOf('size') !== -1) {
+          if (name.indexOf('color') !== -1) return inputs[i].value;
+        }
+      }
+      return null;
+    }
+
+    function apply() {
+      var color = currentColor();
+      if (!color) return;
+      var lists = document.querySelectorAll('.product__media-list, .product__thumbnail-list');
+      var visible = 0;
+      var hadColor = false;
+      /* primero detectar si el color tiene fotos; si no, no filtrar */
+      var mainImgs = Array.prototype.map.call(
+        document.querySelectorAll('.product__media-list li img'),
+        function (im) { return (im.alt || '').trim(); });
+      if (color && mainImgs.indexOf(color) === -1) color = null;
+      lists.forEach(function (list) {
+        Array.prototype.forEach.call(list.children, function (li) {
+          var img = li.querySelector('img');
+          var alt = (img && img.alt ? img.alt : '').trim();
+          var show = color ? alt === color : true;
+          li.style.display = show ? '' : 'none';
+          if (show && list.classList.contains('product__media-list')) visible++;
+        });
+      });
+      /* scroll al inicio + contador */
+      mediaList.scrollTo({ left: 0, behavior: 'smooth' });
+      var first = mediaList.querySelector('li:not([style*="none"])');
+      if (first) {
+        Array.prototype.forEach.call(mediaList.children, function (li) { li.classList.remove('is-active'); });
+        first.classList.add('is-active');
+      }
+      updateCounter(visible);
+    }
+
+    function updateCounter(total) {
+      var cur = document.querySelector('.slider-counter--current');
+      var tot = document.querySelector('.slider-counter--total') || document.querySelectorAll('.slider-counter span.visually-hidden ~ span, .slider-counter span')[2];
+      /* Dawn: current + " / " + total (el total va en el último span del counter) */
+      var spans = document.querySelectorAll('.slider-counter--current, .slider-counter--total');
+      if (spans.length >= 2) {
+        spans[0].textContent = '1';
+        spans[1].textContent = total;
+      }
+    }
+
+    /* cambios de variante */
+    document.addEventListener('change', function (e) {
+      if (e.target && e.target.type === 'radio' && e.target.closest('.product-form__input')) {
+        setTimeout(apply, 50);
+      }
+    });
+    apply();
+  }
+
+  /* ============ 2. Grids: card por variación ============ */
+  function grids() {
+    var sections = document.querySelectorAll('.shopify-section');
+    Array.prototype.forEach.call(sections, function (section) {
+      var sid = section.id || '';
+      if (sid.indexOf('featured-collection') === -1 && sid.indexOf('product-grid') === -1) return;
+      if (section.dataset.melvaColors === 'done') return;
+      section.dataset.melvaColors = 'done';
+
+      var items = section.querySelectorAll('li.grid__item');
+      Array.prototype.forEach.call(items, function (li) {
+        var link = li.querySelector('a[href*="/products/"]');
+        var img = li.querySelector('img');
+        if (!link || !img) return;
+        var handle = (link.getAttribute('href').split('/products/')[1] || '').split('?')[0];
+        var prod = DATA.products.filter(function (p) { return p.handle === handle; })[0];
+        if (!prod) return;
+        var byColor = {};
+        prod.colors.forEach(function (c) {
+          if (!byColor[c.color]) byColor[c.color] = c;
+        });
+        var colors = Object.keys(byColor);
+        if (colors.length <= 1) return;
+
+        var frag = document.createDocumentFragment();
+        colors.forEach(function (color) {
+          var v = byColor[color];
+          var clone = li.cloneNode(true);
+          var clink = clone.querySelector('a[href*="/products/"]');
+          if (clink) clink.setAttribute('href', '/products/' + handle + '?variant=' + v.id);
+          var cimg = clone.querySelector('img');
+          if (cimg && v.img) {
+            cimg.removeAttribute('srcset');
+            cimg.setAttribute('src', v.img);
+            cimg.setAttribute('alt', prod.title + ' ' + color);
+          }
+          var heading = clone.querySelector('.card__heading a, .card__heading');
+          if (heading) heading.textContent = prod.title + ' ' + color;
+          frag.appendChild(clone);
+        });
+        li.style.display = 'none';
+        li.parentNode.insertBefore(frag, li.nextSibling);
+      });
+    });
+  }
+
+  /* preselección desde la colección: ?variant=ID -> marcar color+talle en Dawn */
+  function preselectFromUrl() {
+    var vid = parseInt(new URLSearchParams(location.search).get('variant'), 10);
+    if (!vid || !window.MELVA_COLORS) return;
+    var found = null;
+    window.MELVA_COLORS.products.forEach(function (p) {
+      p.colors.forEach(function (col) {
+        col.sizes.forEach(function (s) { if (s.id === vid) found = { color: col.color, size: s.s }; });
+      });
+    });
+    if (!found) return;
+    var inputs = Array.prototype.slice.call(document.querySelectorAll('input[type="radio"]'));
+    var colorInput = inputs.filter(function (i) { return i.value === found.color && /color/i.test(i.name); })[0];
+    var sizeInput = inputs.filter(function (i) { return i.value === found.size && /talle|size/i.test(i.name); })[0];
+    if (colorInput && !colorInput.checked) { colorInput.checked = true; colorInput.dispatchEvent(new Event('change', { bubbles: true })); }
+    if (sizeInput && !sizeInput.checked) { sizeInput.checked = true; sizeInput.dispatchEvent(new Event('change', { bubbles: true })); }
+  }
+
+  if (document.querySelector('.product__media-list')) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () { pdp(); preselectFromUrl(); });
+    } else {
+      pdp();
+      preselectFromUrl();
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', grids);
+  } else {
+    grids();
+  }
+})();
+</script>

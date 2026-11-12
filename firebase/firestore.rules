@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Solo el backend (Admin SDK) escribe. Nada es accesible desde clientes.
+    allow read, write: if false;
+
+    match /config/{doc} { allow read, write: if false; }
+    match /tryon_counts/{doc} { allow read, write: if false; }
+    match /tryon_logs/{doc} { allow read, write: if false; }
+  }
+}
