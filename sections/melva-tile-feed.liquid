@@ -86,8 +86,10 @@
 
   (function () {
     'use strict';
+    try {
 
-    /* ---- entrada al scroll: delays y offsets aleatorios (orgánico, no mecánico) ---- */
+    /* ---- entrada al scroll: delays y offsets aleatorios (orgánico, no mecánico) ----
+       Fail-safe: si algo falla abajo, el feed queda visible (la clase ready va al final). */
     var cells = document.querySelectorAll('.melva-feed__cell');
     Array.prototype.forEach.call(cells, function (li) {
       li.style.setProperty('--d', Math.round(Math.random() * 220) + 'ms');
@@ -100,6 +102,8 @@
         });
       }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
       Array.prototype.forEach.call(cells, function (li) { io.observe(li); });
+      var feedEl = document.querySelector('.melva-feed');
+      if (feedEl) feedEl.classList.add('melva-feed--ready');
     } else {
       Array.prototype.forEach.call(cells, function (li) { li.classList.add('is-in'); });
     }
@@ -260,6 +264,11 @@
       }
       openSheet(item, activeColor);
     });
+    } catch (e) {
+      /* fail-safe absoluto: ante cualquier error, feed visible y funcional */
+      document.querySelectorAll('.melva-feed__cell').forEach(function (li) { li.classList.add('is-in'); });
+      console.error('melva-feed', e);
+    }
   })();
   </script>
 </section>
@@ -336,14 +345,16 @@
   box-shadow: 0 0 3px rgba(0, 0, 0, .25);
 }
 .melva-tile__dot.is-on { background: #ffffff; }
-/* entrada al scroll: fade + rise con delay/offset aleatorios */
-.melva-feed__cell {
+/* entrada al scroll: fade + rise con delay/offset aleatorios.
+   Fail-safe: la animación solo se activa cuando el JS agrega .melva-feed--ready;
+   sin JS (o si el JS falla) el feed es completamente visible. */
+.melva-feed--ready .melva-feed__cell {
   opacity: 0;
   transform: translateY(14px) translateX(var(--x, 0));
   transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--d, 0ms);
 }
-.melva-feed__cell.is-in {
+.melva-feed--ready .melva-feed__cell.is-in {
   opacity: 1;
   transform: none;
 }
@@ -472,7 +483,7 @@
   .melva-feed__overlay { opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .melva-feed__cell { opacity: 1; transform: none; transition: none; }
+  .melva-feed--ready .melva-feed__cell { opacity: 1; transform: none; transition: none; }
   .melva-tile__img { transition: none; }
 }
 {% endstyle %}
