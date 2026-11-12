@@ -20,6 +20,8 @@
   var errorText = root.querySelector('[data-tryon-error]');
   var liveRegion = root.querySelector('[data-tryon-live]');
   var dropzoneHint = root.querySelector('.melva-tryon-dropzone-hint');
+  /* el dropzone vive en el modal (movido a body): buscarlo via modal, no via root */
+  var dropzoneEl = modal ? modal.querySelector('.melva-tryon-dropzone') : null;
   var HINT_DEFAULT = 'De pie, buena luz, ropa ajustada al cuerpo';
   var lastFocus = null;
   var userImageB64 = null;
@@ -65,7 +67,7 @@
   function downscale(file, cb) {
     /* iOS-safe: las fotos de camara moderna (48MP) rompen el canvas de un paso.
        Dos pasos + verificacion + feedback de error visible. */
-    var hint = root.querySelector('.melva-tryon-dropzone-hint');
+    var hint = dropzoneHint;
     var reader = new FileReader();
     reader.onload = function () {
       var img = new Image();
@@ -172,15 +174,27 @@
   });
   fileInput.addEventListener('change', function () {
     if (!fileInput.files || !fileInput.files[0]) return;
-    var hint = root.querySelector('.melva-tryon-dropzone-hint');
+    var dz = dropzoneEl;
+    var hint = dropzoneHint;
+    if (dz) { dz.classList.add('is-processing'); dz.classList.remove('is-loaded', 'is-error'); }
     if (hint) hint.textContent = 'Procesando foto…';
     userImageB64 = null;
     updateGo();
-    downscale(fileInput.files[0], function (b64) {
+    downscale(fileInput.files[0], function (b64, dataUrl) {
       userImageB64 = b64 || null;
       updateGo();
-      if (b64 && hint) hint.textContent = '✓ Foto cargada — podés cambiarla si querés';
-      /* si falla, downscale ya dejó el mensaje de error y el botón sigue deshabilitado */
+      if (!dz) return;
+      dz.classList.remove('is-processing');
+      if (b64 && dataUrl) {
+        /* feedback inconfundible: la foto elegida se ve dentro del dropzone */
+        dz.style.setProperty('--melva-photo', 'url("' + dataUrl + '")');
+        dz.classList.add('is-loaded');
+        if (hint) hint.textContent = '✓ Foto cargada — tocá la foto para cambiarla';
+      } else {
+        dz.classList.add('is-error');
+        dz.classList.remove('is-loaded');
+        dz.style.removeProperty('--melva-photo');
+      }
     });
   });
   consent.addEventListener('change', updateGo);
