@@ -222,20 +222,35 @@
         .then(function (r) { return r.json(); })
         .then(function (res) {
           if (res.status) throw new Error(res.description || 'error');
+          qs.querySelector('.melva-qs__done').textContent = '✓ Agregado al carrito';
           qs.querySelector('.melva-qs__done').hidden = false;
           updateCartBubble();
           try { if (window.gtag) window.gtag('event', 'feed_add_to_cart', { product: current.item.h }); } catch (e) {}
           setTimeout(closeSheet, 1100);
         })
         .catch(function () {
-          btn.textContent = 'Agregar al carrito';
-          btn.disabled = false;
+          var d = qs.querySelector('.melva-qs__done');
+          d.textContent = 'No se pudo agregar. Probá de nuevo.';
+          d.style.color = '#a11';
+          d.hidden = false;
+          setTimeout(function () { d.hidden = true; d.style.color = ''; }, 2200);
         })
         .then(function () { btn.textContent = 'Agregar al carrito'; btn.disabled = false; });
     });
 
     /* swipe por color en cada tile */
     Array.prototype.forEach.call(cells, bindScroller);
+
+    /* flechas desktop: mover colores izq-der con click */
+    document.addEventListener('click', function (e) {
+      var nav = e.target.closest('[data-tile-prev], [data-tile-next]');
+      if (!nav) return;
+      e.preventDefault();
+      var li = nav.closest('.melva-feed__cell');
+      var sc = li && li.querySelector('[data-scroller]');
+      if (!sc) return;
+      sc.scrollBy({ left: nav.hasAttribute('data-tile-next') ? sc.clientWidth : -sc.clientWidth, behavior: 'smooth' });
+    });
 
     /* delegación para los botones + de cada tile */
     document.addEventListener('click', function (e) {
@@ -248,18 +263,23 @@
       if (!item) return;
       var activeColor = li.dataset.activeColor || item.c[0].color;
       if (item.c.length === 1 && item.c[0].sizes.length === 1) {
-        /* única variación: agregar directo */
+        /* única variación: agregar directo (con anti doble-tap) */
+        if (plus.dataset.busy) return;
+        plus.dataset.busy = '1';
         var s = item.c[0].sizes[0];
         fetch('/cart/add.js', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ items: [{ id: s.id, quantity: 1 }] })
         }).then(function (r) { return r.json(); }).then(function (res) {
-          if (res.status) throw new Error('x');
+          if (res.status) throw new Error(res.description || 'x');
           plus.textContent = '✓';
           updateCartBubble();
           setTimeout(function () { plus.textContent = '+'; }, 1400);
-        }).catch(function () {});
+        }).catch(function () {
+          plus.textContent = '!';
+          setTimeout(function () { plus.textContent = '+'; }, 1800);
+        }).then(function () { delete plus.dataset.busy; });
         return;
       }
       openSheet(item, activeColor);
@@ -296,8 +316,8 @@
 .melva-feed__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
-  padding: 0;
+  gap: 2px;
+  padding: 0 2px;
   margin: 0;
   list-style: none;
 }
@@ -330,7 +350,7 @@
 .melva-tile__img {
   width: 100%;
   flex: 0 0 100%;
-  object-fit: contain;   /* foto entera, sin recorte */
+  object-fit: cover;   /* la foto llena y queda fija en su espacio */
   display: block;
   scroll-snap-align: start;
   scroll-snap-stop: always;
@@ -358,12 +378,39 @@
   background: rgba(18, 18, 18, .28);
 }
 .melva-tile__dot.is-on { background: #121212; }
+/* flechas de color (desktop): aparecen al pasar el mouse, sutiles */
+.melva-tile__nav {
+  display: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .6);
+  -webkit-backdrop-filter: blur(10px) saturate(1.5);
+  backdrop-filter: blur(10px) saturate(1.5);
+  border: 0.5px solid rgba(255, 255, 255, .75);
+  color: #121212;
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+.melva-tile__nav--prev { left: 6px; }
+.melva-tile__nav--next { right: 6px; }
+@media (hover: hover) and (min-width: 768px) {
+  .melva-feed__cell:hover .melva-tile__nav { display: flex; }
+}
 /* info debajo de la foto: legible siempre, sobre blanco */
 .melva-tile__info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 8px 2px 12px;
+  gap: 1px;
+  padding: 7px 2px 9px;
 }
 .melva-tile__name {
   font-size: 13px;
@@ -381,25 +428,32 @@
   right: 8px;
   bottom: 8px;
   z-index: 3;
+  /* glass flotante estilo Apple: sutil, no tapa la foto */
+  background: rgba(255, 255, 255, .55);
+  -webkit-backdrop-filter: blur(12px) saturate(1.6);
+  backdrop-filter: blur(12px) saturate(1.6);
+  border: 0.5px solid rgba(255, 255, 255, .75);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .10);
+}
+.melva-tile__media .melva-feed__plus:hover {
+  background: rgba(255, 255, 255, .75);
+  transform: scale(1.06);
 }
 .melva-feed__plus {
   width: 40px;
   height: 40px;
   border: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, .92);
   color: #121212;
   font-size: 19px;
   font-weight: 600;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .14);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform 0.2s ease, background 0.2s ease;
 }
-.melva-feed__plus:hover { transform: scale(1.08); background: #fff; }
 /* entrada al scroll: fade + rise con delay/offset aleatorios.
    Fail-safe: la animación solo se activa cuando el JS agrega .melva-feed--ready;
    sin JS (o si el JS falla) el feed es completamente visible. */
@@ -456,8 +510,8 @@
 .melva-qs__done { text-align: center; font-size: 13.5px; color: #1a7a2e; margin: 4px 0 0; }
 @media (max-width: 767px) {
   .melva-feed { padding: 2px 0 64px; }
-  .melva-feed__grid { grid-template-columns: repeat(2, 1fr); gap: 10px 8px; padding: 0 8px; }
-  .melva-qs__card { left: 50%; right: auto; top: auto; bottom: 0; transform: none; width: 100%; max-width: none; border-radius: 14px 14px 0 0; }
+  .melva-feed__grid { grid-template-columns: repeat(2, 1fr); gap: 2px; padding: 0 2px; }
+  .melva-qs__card { left: 0; right: 0; top: auto; bottom: 0; transform: none; width: 100%; max-width: none; border-radius: 14px 14px 0 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .melva-feed--ready .melva-feed__cell { opacity: 1; transform: none; transition: none; }
@@ -472,8 +526,6 @@
   "class": "section melva-feed-section",
   "disabled_on": { "groups": ["header"] },
   "settings": [
-    { "type": "text", "id": "heading", "label": "Título", "default": "En las calles" },
-    { "type": "text", "id": "subheading", "label": "Subtítulo", "default": "Tocá una foto para ver la prenda." },
     {
       "type": "checkbox",
       "id": "prioritize_sale",

@@ -1,0 +1,334 @@
+{% comment %}
+  Hero Melva — slideshow réplica del hero de la web original (melva-uy).
+  Slide 1: hero-desktop.jpg / hero-mobile.jpg (media query). Slides 2-3: fotos de campaña
+  con crossfade + Ken Burns suave sobre el wrapper (evita el bug de raster del img).
+  Copy fijo (eyebrow/título/subtítulo/2 CTAs) encima, siempre legible.
+{% endcomment %}
+
+<section class="melva-hero">
+  <div class="melva-hero__media" aria-hidden="true">
+    <picture class="melva-hero__picture">
+    {%- if section.settings.image_mobile != blank -%}
+      <source media="(max-width: 767px)" srcset="{{ section.settings.image_mobile | image_url: width: 1000 }}">
+    {%- else -%}
+      <source media="(max-width: 767px)" srcset="{{ 'hero-mobile.jpg' | asset_url }}">
+    {%- endif -%}
+    <img
+      {% if section.settings.image != blank %}
+        src="{{ section.settings.image | image_url: width: 2400 }}"
+      {% else %}
+        src="{{ 'hero-desktop.jpg' | asset_url }}"
+      {% endif %}
+      class="melva-hero__image"
+      alt="{{ section.settings.image_alt | default: shop.name }}"
+      width="1920"
+      height="1080"
+    >
+    </picture>
+    <img class="melva-hero__slide melva-hero__slide--2" src="{{ 'hero2.jpg' | asset_url }}" alt="" width="1920" height="1280">
+    <img class="melva-hero__slide melva-hero__slide--3" src="{{ 'hero3.jpg' | asset_url }}" alt="" width="1920" height="1280">
+  </div>
+  <div class="melva-hero__overlay" aria-hidden="true"></div>
+  <div class="melva-hero__content">
+    <div class="melva-hero__copy">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="melva-hero__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h1 class="melva-hero__title">{{ section.settings.title }}</h1>
+      {%- if section.settings.subtitle != blank -%}
+        <p class="melva-hero__subtitle">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+      <div class="melva-hero__actions">
+        {%- if section.settings.button_label != blank -%}
+          <a
+            {% if section.settings.button_link != blank %}
+              href="{{ section.settings.button_link }}"
+            {% else %}
+              role="link" aria-disabled="true"
+            {% endif %}
+            class="melva-hero__cta melva-hero__cta--primary"
+          >{{ section.settings.button_label }}</a>
+        {%- endif -%}
+        {%- if section.settings.button_label_2 != blank -%}
+          <a
+            {% if section.settings.button_link_2 != blank %}
+              href="{{ section.settings.button_link_2 }}"
+            {% else %}
+              role="link" aria-disabled="true"
+            {% endif %}
+            class="melva-hero__cta melva-hero__cta--secondary"
+          >{{ section.settings.button_label_2 }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% style %}
+.melva-hero {
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  background: #1a1a1a;
+}
+.melva-hero__picture {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+.melva-hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  animation: none;
+  will-change: transform;
+}
+.melva-hero__slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  display: block;
+  opacity: 0;
+  animation: melva-slide-fade 21s ease-in-out infinite;
+}
+.melva-hero__slide--2 { animation-delay: 7s; }
+.melva-hero__slide--3 { animation-delay: 14s; }
+@keyframes melva-slide-fade {
+  0% { opacity: 0; }
+  4% { opacity: 1; }
+  29% { opacity: 1; }
+  36% { opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes melva-hero-kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+.melva-hero__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+}
+.melva-hero__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.35) 50%, rgba(0, 0, 0, 0.55));
+}
+.melva-hero__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 96px 24px max(40px, env(safe-area-inset-bottom, 0px));
+  color: #ffffff;
+}
+.melva-hero__copy {
+  width: 100%;
+  max-width: 520px;
+  animation: melva-hero-fade-up 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s both;
+}
+.melva-hero__eyebrow {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+.melva-hero__title {
+  margin: 0 0 12px;
+  color: #ffffff;
+  font-size: clamp(2rem, 8vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+.melva-hero__subtitle {
+  margin: 0 0 20px;
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.55;
+  max-width: 460px;
+  opacity: 0.92;
+}
+.melva-hero__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.melva-hero__cta {
+  width: 100%;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.melva-hero__cta:hover {
+  transform: translateY(-2px);
+}
+.melva-hero__cta--primary {
+  color: #121212;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+.melva-hero__cta--primary:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
+}
+.melva-hero__cta--secondary {
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(4px);
+}
+.melva-hero__cta--secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: #ffffff;
+}
+@media (max-width: 767px) {
+  .melva-hero {
+    min-height: calc(100svh - 120px);
+  }
+  .melva-hero__image {
+    object-position: center 30%;
+  }
+}
+@media (min-width: 768px) {
+  .melva-hero {
+    min-height: min(calc(100svh - 110px), 720px);
+  }
+  .melva-hero__image {
+    object-position: center center;
+  }
+  .melva-hero__content {
+    padding-top: 32px;
+    padding-bottom: 72px;
+  }
+  .melva-hero__copy {
+    max-width: 640px;
+  }
+  .melva-hero__eyebrow {
+    margin-bottom: 12px;
+    font-size: 0.75rem;
+  }
+  .melva-hero__title {
+    margin-bottom: 16px;
+    font-size: clamp(2.75rem, 5.5vw, 4.5rem);
+    line-height: 1.05;
+  }
+  .melva-hero__subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.125rem);
+    margin-bottom: 28px;
+  }
+  .melva-hero__actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .melva-hero__cta {
+    width: auto;
+  }
+}
+@keyframes melva-hero-fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .melva-hero__media { animation: none; }
+  .melva-hero__slide { animation: none; opacity: 0; }
+  .melva-hero__slide--2, .melva-hero__slide--3 { display: none; }
+  .melva-hero__copy { animation: none; }
+}
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Hero Melva",
+  "tag": "section",
+  "class": "section melva-hero-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Imagen (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Imagen (mobile)"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Texto alternativo",
+      "default": "Campaña Melva"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Etiqueta superior",
+      "default": "Nueva colección"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "label": "Título",
+      "default": "Diseño con propósito, hecho en Uruguay"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtítulo",
+      "default": "Piezas versátiles en ediciones limitadas, para quienes buscan vestir con intención."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Botón primario",
+      "default": "Ver colección"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Link botón primario"
+    },
+    {
+      "type": "text",
+      "id": "button_label_2",
+      "label": "Botón secundario",
+      "default": "Conocé la marca"
+    },
+    {
+      "type": "url",
+      "id": "button_link_2",
+      "label": "Link botón secundario"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Melva"
+    }
+  ]
+}
+{% endschema %}

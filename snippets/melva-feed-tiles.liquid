@@ -46,6 +46,10 @@
         </div>
       {%- endif -%}
       </a>
+      {%- if n_colors > 1 -%}
+        <button type="button" class="melva-tile__nav melva-tile__nav--prev" data-tile-prev aria-label="Color anterior">‹</button>
+        <button type="button" class="melva-tile__nav melva-tile__nav--next" data-tile-next aria-label="Color siguiente">›</button>
+      {%- endif -%}
       <button
         type="button"
         class="melva-feed__plus"
